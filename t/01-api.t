@@ -4,7 +4,7 @@ use DBI;
 use DBD::SQLite;
 use DBIx::InjectionScan;
 
-use Test::More tests => 3*4;
+use Test::More tests => 3*6;
 
 my $dbh = DBI->connect('dbi:SQLite:dbname=:memory:', undef, undef, {
     RaiseError => 1,
@@ -35,6 +35,15 @@ my @queries = (
 );
 
 for my $attempt (@queries) {
+    @calls = ();
+    my $sth = eval { $dbh->prepare($attempt); };
+    if( $sth ) {
+        eval { $sth->fetchall_arrayref }
+    };
+    is $calls[0]->[1], $attempt, "The SQL statement gets logged with 'prepare/fetchall'";
+    is @calls, 1, "We detect $attempt";
+
+
     @calls = ();
     eval { $dbh->do($attempt); };
     is @calls, 1, "We detect $attempt";
