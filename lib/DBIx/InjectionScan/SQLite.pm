@@ -8,16 +8,18 @@ no warnings 'experimental::signatures';
 our $VERSION = '0.01';
 
 our @sqlite_whitelist = ();
-sub detect_injection_scan($errstr,$dbh,$err) {
-    local $_ = $errstr;
-       /\ADBD::SQLite::db \w+ failed: no such column: /
-    || /\ADBD::SQLite::db \w+ failed: near ".*?": syntax error$/
-    || /\ADBD::SQLite::db \w+ failed: unrecognized token:/
+
 has ignorelist => (
     is => 'ro',
     default => sub { [ @sqlite_whitelist ] },
 );
 
+sub detect_injection_scan($self,$errstr,$dbh,$err) {
+    0 == grep { $errstr !~ /$_/ } @{ $self->ignorelist }
+    #local $_ = $errstr;
+    #   /\ADBD::SQLite::db \w+ failed: no such column: /
+    #|| /\ADBD::SQLite::db \w+ failed: near ".*?": syntax error$/
+    #|| /\ADBD::SQLite::db \w+ failed: unrecognized token:/
 }
 
 1;
