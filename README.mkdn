@@ -1,0 +1,35 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/DBIx-InjectionScan.svg?branch=master)](https://travis-ci.org/Corion/DBIx-InjectionScan)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/DBIx-InjectionScan?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/DBIx-InjectionScan)
+
+CONTRIBUTING
+
+See lib/WWW/Mechanize/Chrome/Contributing.pod
+
+[Google Keep Extraction](https://github.com/Corion/WWW-Mechanize-Chrome/raw/master/demo/keep-export-demo.mp4)
+
+# NAME
+
+DBIx::InjectionScan - detect when an SQL injection scan fails
+
+# SYNOPSIS
+
+    my $dbh = DBI->connect('dbi:SQLite:dbname=:memory:', undef, undef, {
+        HandleError => \&detect_injection_scan,
+        #RaiseError => 1,
+        PrintError => 0,
+    });
+
+    my $scan_detected = DBIx::InjectionScan->wrap(
+        dbh => $dbh,
+        on_detection => sub( $dbh, $statement, $file, $package, $line ) {
+            warn "Possible SQL injection hole in <<$statement>> called from $location";
+            # mail this information to your security team
+        },
+    );
+
+# METHODS
+
+This is a detector for failed attempts of SQL injections. Alerts raised by this
+detector are most likely caused by exploitable use of strings to build SQL
+statements.

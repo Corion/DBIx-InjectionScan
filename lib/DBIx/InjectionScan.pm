@@ -7,6 +7,8 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 use Carp 'croak';
 
+our $VERSION = '0.01';
+
 =head1 NAME
 
 DBIx::InjectionScan - detect when an SQL injection scan fails
