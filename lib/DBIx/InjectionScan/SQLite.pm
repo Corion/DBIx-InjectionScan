@@ -1,16 +1,23 @@
 package DBIx::InjectionScan::SQLite;
 use strict;
+use Moo;
 use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
 our $VERSION = '0.01';
 
+our @sqlite_whitelist = ();
 sub detect_injection_scan($errstr,$dbh,$err) {
     local $_ = $errstr;
        /\ADBD::SQLite::db \w+ failed: no such column: /
     || /\ADBD::SQLite::db \w+ failed: near ".*?": syntax error$/
     || /\ADBD::SQLite::db \w+ failed: unrecognized token:/
+has ignorelist => (
+    is => 'ro',
+    default => sub { [ @sqlite_whitelist ] },
+);
+
 }
 
 1;

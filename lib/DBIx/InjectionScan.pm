@@ -1,5 +1,6 @@
 package DBIx::InjectionScan;
 use Moo;
+use Module::Load 'load';
 use Scalar::Util 'weaken';
 use Filter::signatures;
 use feature 'signatures';
@@ -69,7 +70,8 @@ sub find_non_dbi_caller( $self ) {
 };
 
 sub on_error( $self, $dbh, $error, $statement ) {
-    if( $self->detector( $dbh, $error, $statement ) and my $d = $self->on_detection) {
+    if(     my $d = $self->on_detection
+        and $self->detector->detect_injection_scan( $dbh, $error, $statement )) {
         my $location = $self->find_non_dbi_caller;
         $d->( $dbh, $error, $statement, $location );
     }
@@ -91,13 +93,8 @@ sub wrap( $class, %options ) {
     my $dbh_class = $self->dbh->{Driver}->{Name};
     my $detector = $detectors{ $dbh_class }
         or croak "Unknown database class '$dbh_class'"; # well, we should use a generic fallback
-    (my $module=$detector) =~ s!::!/!g;
-    require "$module.pm";
-
-    my $d = do {
-        no strict 'refs';
-        \&{ "$detector\::detect_injection_scan"};
-    };
+    load $detector;
+    my $d = $detector->new();
     $self->detector( $d );
 
     $self->dbh_install( $self->dbh );
