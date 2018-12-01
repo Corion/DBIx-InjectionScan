@@ -21,6 +21,6 @@ Makefile$
 ^.releaserc
 ^.*.cmd
 ^chrome-versions
-^WWW-Mechanize-Chrome
+^DBIx-InjectionScan-.*
 ^frame-\d+.png
 ^demo/
