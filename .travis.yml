@@ -1,6 +1,6 @@
 language: perl
 perl:
-  - "5.6"         # Our claimed baseline
+  # - "5.6" # does not work on Travis anymore?!
   - "5.8.4"
   - "5.8.4-thr"
   - "5.8.8"       # common, prebuilt version
