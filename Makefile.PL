@@ -13,6 +13,7 @@ $eumm_version =~ s/_//;
 my $module = 'DBIx::InjectionScan';
 (my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
 (my $distbase = $module) =~ s!::!-!g;
+my $distlink = $distbase;
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
@@ -25,8 +26,8 @@ my %module = (
         "meta-spec" => { version => 2 },
         resources => {
             repository => {
-                web => "https://github.com/Corion/$distbase",
-                url => "git://github.com/Corion/$distbase.git",
+                web => "https://github.com/Corion/$distlink",
+                url => "git://github.com/Corion/$distlink.git",
                 type => 'git',
             }
         },
@@ -53,10 +54,11 @@ my %module = (
         'Moo'                => 2, # for some hashes-as-objects
         'Module::Load'       => 0,
         'Scalar::Util'       => 0,
-
     },
     TEST_REQUIRES => {
         'DBD::SQLite'        => 0,
+        'Test::More'         => 0,
+        'Data::Dumper'       => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -74,7 +76,7 @@ sub get_module_info { %module }
 if( ! caller ) {
     # I should maybe use something like Shipwright...
     regen_README($main_file);
-    #regen_EXAMPLES();
+    regen_EXAMPLES() if -d 'examples';
     WriteMakefile1(get_module_info);
 };
 
@@ -160,8 +162,8 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Travis Build Status](https://travis-ci.org/Corion/$distbase.svg?branch=master)](https://travis-ci.org/Corion/$distbase)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distbase?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distbase)
+[![Travis Build Status](https://travis-ci.org/Corion/$distlink.svg?branch=master)](https://travis-ci.org/Corion/$distlink)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distlink?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distlink)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );
@@ -175,11 +177,12 @@ sub pod_section {
 
     my @section =
         grep { /^=head1\s+$section/.../^=/ } <$fh>;
-    pop @section if $section[-1] =~ /^=/;
-    shift @section if $remove_heading;
 
     # Trim the section
     if( @section ) {
+        pop @section if $section[-1] =~ /^=/;
+        shift @section if $remove_heading;
+
         pop @section
             while $section[-1] =~ /^\s*$/;
         shift @section
@@ -195,11 +198,12 @@ sub regen_EXAMPLES {
     if ($perl =~/\s/) {
         $perl = qq{"$perl"};
     };
+    (my $example_file = $main_file) =~ s!\.pm$!/Examples.pm!;
     my $examples = `$perl -w examples/gen_examples_pod.pl`;
     if ($examples) {
-        warn "(Re)Creating lib/WWW/Mechanize/Chrome/Examples.pm\n";
+        warn "(Re)Creating $example_file\n";
         $examples =~ s/\r\n/\n/g;
-        update_file( 'lib/WWW/Mechanize/Chrome/Examples.pm', $examples );
+        update_file( $example_file, $examples );
     };
 };
 
