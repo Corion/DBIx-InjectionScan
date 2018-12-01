@@ -29,11 +29,13 @@ DBIx::InjectionScan - detect when an SQL injection scan fails
         },
     );
 
-=head1 METHODS
+=head1 DESCRIPTION
 
 This is a detector for failed attempts of SQL injections. Alerts raised by this
 detector are most likely caused by exploitable use of strings to build SQL
 statements.
+
+=head1 METHODS
 
 =cut
 
