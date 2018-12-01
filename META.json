@@ -39,7 +39,7 @@
             "Module::Load" : "0",
             "Moo" : "2",
             "Scalar::Util" : "0",
-            "perl" : "5.010"
+            "perl" : "5.006"
          }
       },
       "test" : {

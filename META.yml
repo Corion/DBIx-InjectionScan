@@ -28,7 +28,7 @@ requires:
   Module::Load: '0'
   Moo: '2'
   Scalar::Util: '0'
-  perl: '5.010'
+  perl: '5.006'
 resources:
   repository: git://github.com/Corion/DBIx-InjectionScan.git
 version: '0.01'
